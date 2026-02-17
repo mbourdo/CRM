@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Annuity Funnel CRM</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700&family=Nunito:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="header">
+        <div>
+          <p class="eyebrow">Meta Ads Annuity Funnel</p>
+          <h1>CRM Dashboard</h1>
+        </div>
+        <div class="header-actions">
+          <button id="exportCsvBtn" class="btn btn-secondary">Export CSV</button>
+          <button id="importCsvBtn" class="btn btn-secondary">Import CSV</button>
+          <button id="newLeadBtn" class="btn btn-primary">+ New Lead</button>
+          <input id="importCsvInput" type="file" accept=".csv,text/csv" class="hidden-input" />
+        </div>
+      </header>
+
+      <section class="focus-kpi">
+        <div class="focus-kpi-head">
+          <p class="focus-kpi-label">Motivation Board</p>
+          <p class="focus-kpi-sub">Track what matters most: Pipeline, Commission, and Cost Efficiency.</p>
+        </div>
+        <div class="focus-kpi-grid">
+          <article class="focus-tile focus-tile-pipeline">
+            <p class="focus-tile-label">Pipeline Assets (Active)</p>
+            <h2 id="kpiPipelineTop">$0</h2>
+          </article>
+          <article class="focus-tile focus-tile-commission">
+            <p class="focus-tile-label">Commission @ 7%</p>
+            <h2 id="kpiPipelineCommissionTop" class="focus-big-money">$0</h2>
+          </article>
+          <article class="focus-tile focus-tile-cost">
+            <p class="focus-tile-label">Cost / Qualified Attended</p>
+            <h2 id="kpiCostPerQualifiedTop">$0</h2>
+            <p id="kpiQualifiedCloseRate" class="focus-tile-sub">Close rate: 0.0% (0/0)</p>
+          </article>
+        </div>
+        <div class="focus-controls">
+          <p class="focus-attended">
+            <span id="kpiQualifiedAttended">0</span>
+            Qualified Prospect Meetings Attended
+          </p>
+          <label>
+            Ad Spend ($)
+            <input id="adSpendInput" type="text" inputmode="numeric" placeholder="$0" value="$0" />
+          </label>
+        </div>
+      </section>
+
+      <section class="kpi-grid" id="kpiGrid">
+        <article class="kpi-card">
+          <p>Total Leads</p>
+          <h2 id="kpiTotalLeads">0</h2>
+        </article>
+        <article class="kpi-card">
+          <p>Appointments Booked</p>
+          <h2 id="kpiBooked">0</h2>
+        </article>
+        <article class="kpi-card kpi-pipeline-card">
+          <p>Pipeline (Est. Premium)</p>
+          <h2 id="kpiPipeline">$0</h2>
+          <p class="kpi-subline">Commission @ 7%</p>
+          <p id="kpiPipelineCommission" class="kpi-commission">$0</p>
+        </article>
+        <article class="kpi-card">
+          <p>Closed Won</p>
+          <h2 id="kpiWon">0</h2>
+        </article>
+        <article class="kpi-card">
+          <p>No Shows</p>
+          <h2 id="kpiNoShow">0</h2>
+        </article>
+        <article class="kpi-card">
+          <p>Inactive</p>
+          <h2 id="kpiInactive">0</h2>
+        </article>
+      </section>
+
+      <section class="aggregate-tasks">
+        <div class="aggregate-tasks-head">
+          <h3>Upcoming Appointments</h3>
+          <p id="aggregateTasksCount">0 upcoming</p>
+        </div>
+        <div id="aggregateTasksList" class="aggregate-tasks-list"></div>
+        <div class="aggregate-tasks-head">
+          <h3>Open Tasks</h3>
+          <p id="aggregateOpenTasksCount">0 open</p>
+        </div>
+        <div id="aggregateOpenTasksList" class="aggregate-tasks-list"></div>
+      </section>
+
+      <section class="board" id="pipelineBoard">
+        <div class="column" data-stage="lead">
+          <h3>Leads</h3>
+          <div class="lead-list" id="leadList-lead"></div>
+        </div>
+        <div class="column" data-stage="firstAppointmentBooked">
+          <h3>1st Appointment Booked</h3>
+          <div class="lead-list" id="leadList-firstAppointmentBooked"></div>
+        </div>
+        <div class="column" data-stage="firstAppointmentNoShow">
+          <h3>1st Appointment No Show</h3>
+          <div class="lead-list" id="leadList-firstAppointmentNoShow"></div>
+        </div>
+        <div class="column" data-stage="firstAppointmentRescheduled">
+          <h3>1st Appointment Rescheduled</h3>
+          <div class="lead-list" id="leadList-firstAppointmentRescheduled"></div>
+        </div>
+        <div class="column" data-stage="firstAppointmentConfirmed">
+          <h3>1st Appointment Confirmed</h3>
+          <div class="lead-list" id="leadList-firstAppointmentConfirmed"></div>
+        </div>
+        <div class="column" data-stage="secondAppointmentBooked">
+          <h3>2nd Appointment Booked</h3>
+          <div class="lead-list" id="leadList-secondAppointmentBooked"></div>
+        </div>
+        <div class="column" data-stage="secondAppointmentConfirmed">
+          <h3>2nd Appointment Confirmed</h3>
+          <div class="lead-list" id="leadList-secondAppointmentConfirmed"></div>
+        </div>
+        <div class="column" data-stage="secondAppointmentRescheduled">
+          <h3>2nd Appointment Rescheduled</h3>
+          <div class="lead-list" id="leadList-secondAppointmentRescheduled"></div>
+        </div>
+        <div class="column" data-stage="secondAppointmentAttended">
+          <h3>2nd Appointment Attended</h3>
+          <div class="lead-list" id="leadList-secondAppointmentAttended"></div>
+        </div>
+        <div class="column" data-stage="thirdAppointmentBooked">
+          <h3>3rd Appointment Booked</h3>
+          <div class="lead-list" id="leadList-thirdAppointmentBooked"></div>
+        </div>
+        <div class="column" data-stage="thirdAppointmentConfirmed">
+          <h3>3rd Appointment Confirmed</h3>
+          <div class="lead-list" id="leadList-thirdAppointmentConfirmed"></div>
+        </div>
+        <div class="column" data-stage="thirdAppointmentRescheduled">
+          <h3>3rd Appointment Rescheduled</h3>
+          <div class="lead-list" id="leadList-thirdAppointmentRescheduled"></div>
+        </div>
+        <div class="column" data-stage="thirdAppointmentAttended">
+          <h3>3rd Appointment Attended</h3>
+          <div class="lead-list" id="leadList-thirdAppointmentAttended"></div>
+        </div>
+        <div class="column" data-stage="pendingWon">
+          <h3>Pending Won</h3>
+          <div class="lead-list" id="leadList-pendingWon"></div>
+        </div>
+        <div class="column" data-stage="pendingLost">
+          <h3>Pending Lost</h3>
+          <div class="lead-list" id="leadList-pendingLost"></div>
+        </div>
+        <div class="column" data-stage="won">
+          <h3>Won</h3>
+          <div class="lead-list" id="leadList-won"></div>
+        </div>
+        <div class="column" data-stage="lost">
+          <h3>Lost</h3>
+          <div class="lead-list" id="leadList-lost"></div>
+        </div>
+        <div class="column" data-stage="unqualified">
+          <h3>Unqualified</h3>
+          <div class="lead-list" id="leadList-unqualified"></div>
+        </div>
+        <div class="column" data-stage="notReady">
+          <h3>Not Ready</h3>
+          <div class="lead-list" id="leadList-notReady"></div>
+        </div>
+      </section>
+    </div>
+
+    <dialog id="leadDialog">
+      <form id="leadForm" method="dialog" class="lead-form">
+        <h2 id="formTitle">New Lead</h2>
+
+        <div class="row">
+          <label>
+            First Name
+            <input type="text" name="firstName" required />
+          </label>
+          <label>
+            Last Name
+            <input type="text" name="lastName" required />
+          </label>
+        </div>
+
+        <label>
+          Nickname
+          <input type="text" name="nickname" placeholder='Example: "Ricky"' />
+        </label>
+
+        <div class="row">
+          <label>
+            Email
+            <input type="email" name="email" required />
+          </label>
+          <label>
+            Phone
+            <input type="tel" name="phone" required />
+          </label>
+        </div>
+
+        <label>
+          State
+          <select name="state">
+            <option value="">Select state</option>
+            <option value="AL">AL</option><option value="AK">AK</option><option value="AZ">AZ</option><option value="AR">AR</option>
+            <option value="CA">CA</option><option value="CO">CO</option><option value="CT">CT</option><option value="DE">DE</option>
+            <option value="FL">FL</option><option value="GA">GA</option><option value="HI">HI</option><option value="ID">ID</option>
+            <option value="IL">IL</option><option value="IN">IN</option><option value="IA">IA</option><option value="KS">KS</option>
+            <option value="KY">KY</option><option value="LA">LA</option><option value="ME">ME</option><option value="MD">MD</option>
+            <option value="MA">MA</option><option value="MI">MI</option><option value="MN">MN</option><option value="MS">MS</option>
+            <option value="MO">MO</option><option value="MT">MT</option><option value="NE">NE</option><option value="NV">NV</option>
+            <option value="NH">NH</option><option value="NJ">NJ</option><option value="NM">NM</option><option value="NY">NY</option>
+            <option value="NC">NC</option><option value="ND">ND</option><option value="OH">OH</option><option value="OK">OK</option>
+            <option value="OR">OR</option><option value="PA">PA</option><option value="RI">RI</option><option value="SC">SC</option>
+            <option value="SD">SD</option><option value="TN">TN</option><option value="TX">TX</option><option value="UT">UT</option>
+            <option value="VT">VT</option><option value="VA">VA</option><option value="WA">WA</option><option value="WV">WV</option>
+            <option value="WI">WI</option><option value="WY">WY</option><option value="DC">DC</option>
+          </select>
+        </label>
+
+        <div class="row">
+          <label>
+            Stage
+            <select name="stage">
+              <option value="lead">Leads</option>
+              <option value="firstAppointmentBooked">1st Appointment Booked</option>
+              <option value="firstAppointmentNoShow">1st Appointment No Show</option>
+              <option value="firstAppointmentRescheduled">1st Appointment Rescheduled</option>
+              <option value="firstAppointmentConfirmed">1st Appointment Confirmed</option>
+              <option value="secondAppointmentBooked">2nd Appointment Booked</option>
+              <option value="secondAppointmentConfirmed">2nd Appointment Confirmed</option>
+              <option value="secondAppointmentRescheduled">2nd Appointment Rescheduled</option>
+              <option value="secondAppointmentAttended">2nd Appointment Attended</option>
+              <option value="thirdAppointmentBooked">3rd Appointment Booked</option>
+              <option value="thirdAppointmentConfirmed">3rd Appointment Confirmed</option>
+              <option value="thirdAppointmentRescheduled">3rd Appointment Rescheduled</option>
+              <option value="thirdAppointmentAttended">3rd Appointment Attended</option>
+              <option value="pendingWon">Pending Won</option>
+              <option value="pendingLost">Pending Lost</option>
+              <option value="won">Won</option>
+              <option value="lost">Lost</option>
+              <option value="unqualified">Unqualified</option>
+              <option value="notReady">Not Ready</option>
+            </select>
+          </label>
+          <label>
+            Est. Premium ($)
+            <input
+              type="text"
+              name="opportunitySize"
+              inputmode="numeric"
+              placeholder="$263,000"
+              value="$0"
+            />
+          </label>
+        </div>
+
+        <label>
+          Lead Status
+          <select name="leadStatus">
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </label>
+
+        <fieldset>
+          <legend>Appointment Tracking</legend>
+          <div class="row">
+            <fieldset>
+              <legend>1st Appointment</legend>
+              <label>
+                Status
+                <select name="firstAppointmentStatus">
+                  <option value="notScheduled">Not scheduled</option>
+                  <option value="scheduled">Scheduled</option>
+                  <option value="completed">Completed</option>
+                  <option value="noShow">No show</option>
+                </select>
+              </label>
+              <label class="check">
+                <input type="checkbox" name="firstConfirmedPhone" />
+                Confirmed by phone
+              </label>
+              <label class="check">
+                <input type="checkbox" name="firstConfirmedCalendar" />
+                Confirmed in calendar
+              </label>
+              <label>
+                1st Appointment Time
+                <input type="datetime-local" name="firstAppointmentAt" />
+              </label>
+              <label>
+                1st Appointment Summary
+                <textarea
+                  name="firstAppointmentSummary"
+                  rows="2"
+                  placeholder="Paste a short summary..."
+                ></textarea>
+              </label>
+              <label>
+                1st Meeting Recording URL
+                <div class="link-input-row">
+                  <input type="url" name="firstMeetingRecordingUrl" placeholder="https://..." />
+                  <button type="button" id="openFirstRecordingBtn" class="btn btn-small btn-ghost">Open</button>
+                </div>
+              </label>
+            </fieldset>
+            <fieldset>
+              <legend>2nd Appointment</legend>
+              <label>
+                Status
+                <select name="secondAppointmentStatus">
+                  <option value="notBooked">Not booked</option>
+                  <option value="scheduled">Scheduled</option>
+                  <option value="completed">Completed</option>
+                  <option value="noShow">No show</option>
+                </select>
+              </label>
+              <label class="check">
+                <input type="checkbox" name="secondConfirmedPhone" />
+                Confirmed by phone
+              </label>
+              <label class="check">
+                <input type="checkbox" name="secondConfirmedCalendar" />
+                Confirmed in calendar
+              </label>
+              <label>
+                2nd Appointment Time
+                <input type="datetime-local" name="secondAppointmentAt" />
+              </label>
+              <label>
+                2nd Appointment Summary
+                <textarea
+                  name="secondAppointmentSummary"
+                  rows="2"
+                  placeholder="Paste a short summary..."
+                ></textarea>
+              </label>
+              <label>
+                2nd Meeting Recording URL
+                <div class="link-input-row">
+                  <input type="url" name="secondMeetingRecordingUrl" placeholder="https://..." />
+                  <button type="button" id="openSecondRecordingBtn" class="btn btn-small btn-ghost">Open</button>
+                </div>
+              </label>
+            </fieldset>
+          </div>
+          <div class="row">
+            <fieldset>
+              <legend>3rd Appointment</legend>
+              <label>
+                Status
+                <select name="thirdAppointmentStatus">
+                  <option value="notBooked">Not booked</option>
+                  <option value="scheduled">Scheduled</option>
+                  <option value="completed">Completed</option>
+                  <option value="noShow">No show</option>
+                </select>
+              </label>
+              <label class="check">
+                <input type="checkbox" name="thirdConfirmedPhone" />
+                Confirmed by phone
+              </label>
+              <label class="check">
+                <input type="checkbox" name="thirdConfirmedCalendar" />
+                Confirmed in calendar
+              </label>
+              <label>
+                3rd Appointment Time
+                <input type="datetime-local" name="thirdAppointmentAt" />
+              </label>
+              <label>
+                3rd Appointment Summary
+                <textarea
+                  name="thirdAppointmentSummary"
+                  rows="2"
+                  placeholder="Paste a short summary..."
+                ></textarea>
+              </label>
+              <label>
+                3rd Meeting Recording URL
+                <div class="link-input-row">
+                  <input type="url" name="thirdMeetingRecordingUrl" placeholder="https://..." />
+                  <button type="button" id="openThirdRecordingBtn" class="btn btn-small btn-ghost">Open</button>
+                </div>
+              </label>
+            </fieldset>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Call Tracking</legend>
+          <p class="helper-text">
+            Open a lead and use Activity Log to record call/text events with timestamps and notes.
+          </p>
+        </fieldset>
+
+        <fieldset id="activitySection" class="hidden">
+          <legend>Activity Log</legend>
+          <div class="activity-toolbar">
+            <button type="button" class="btn btn-small btn-warning dialog-activity-btn" data-activity-type="callLiveContact">Call Live Contact</button>
+            <button type="button" class="btn btn-small btn-secondary dialog-activity-btn" data-activity-type="callVM">Call VM</button>
+            <button type="button" class="btn btn-small btn-secondary dialog-activity-btn" data-activity-type="callNC">Call NC</button>
+            <button type="button" class="btn btn-small btn-info dialog-activity-btn" data-activity-type="textSent">Text Sent</button>
+            <button type="button" class="btn btn-small btn-info dialog-activity-btn" data-activity-type="textReceived">Text Received</button>
+            <button type="button" class="btn btn-small btn-secondary dialog-activity-btn" data-activity-type="emailSent">Email Sent</button>
+            <button type="button" class="btn btn-small btn-secondary dialog-activity-btn" data-activity-type="emailReceived">Email Received</button>
+          </div>
+          <div class="activity-log">
+            <p class="activity-title">Recent Activity</p>
+            <div id="formActivityItems" class="activity-items"></div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Process Status</legend>
+          <div class="row">
+            <label>
+              Documents
+              <select name="documentsStatus">
+                <option value="notRequested">Not requested</option>
+                <option value="waiting">Waiting on documents</option>
+                <option value="received">Received</option>
+              </select>
+            </label>
+            <label>
+              Carrier Outreach
+              <select name="carrierStatus">
+                <option value="notStarted">Not started</option>
+                <option value="contacted">Contacted</option>
+                <option value="quoted">Quoted / options received</option>
+              </select>
+            </label>
+          </div>
+          <div class="row">
+            <label>
+              Documents Notes
+              <textarea
+                name="documentsNotes"
+                rows="2"
+                placeholder="What docs are missing, requested, or received..."
+              ></textarea>
+            </label>
+            <label>
+              Carrier Outreach Notes
+              <textarea
+                name="carrierNotes"
+                rows="2"
+                placeholder="Carrier contact status, quotes, or follow-ups..."
+              ></textarea>
+            </label>
+          </div>
+        </fieldset>
+
+        <label>
+          Next Action
+          <input type="text" name="nextAction" placeholder="Example: Confirm spouse joins meeting" />
+        </label>
+
+        <label>
+          Close Reason
+          <input type="text" name="closeReason" placeholder="Why won/lost or key close note" />
+        </label>
+
+        <fieldset>
+          <legend>Tasks</legend>
+          <div class="task-entry-row">
+            <input
+              type="text"
+              name="taskInput"
+              placeholder="Add a task (example: Send revised annuity options)"
+            />
+            <input type="date" name="taskDueAt" class="task-date-entry" />
+            <select name="taskAssignee" class="task-assignee-entry" aria-label="Task assignee">
+              <option value="JAKE">JAKE</option>
+              <option value="COLBY">COLBY</option>
+            </select>
+            <button type="button" id="addTaskBtn" class="btn btn-secondary">Add Task</button>
+          </div>
+          <div id="formTaskItems" class="form-task-list"></div>
+        </fieldset>
+
+        <label>
+          Notes
+          <textarea
+            name="notes"
+            rows="3"
+            placeholder="Add any extra notes for this prospect..."
+          ></textarea>
+        </label>
+
+        <p id="formCpqpma" class="helper-text">Cost per qualified prospect meeting attended: n/a</p>
+        <label class="check">
+          <input type="checkbox" name="qualifiedProspectMeetingAttended" />
+          Qualified Prospect Meeting Attended?
+        </label>
+
+        <div class="actions">
+          <button type="button" id="deleteLeadBtn" class="btn btn-danger hidden">Delete</button>
+          <button type="button" id="cancelBtn" class="btn btn-secondary">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Lead</button>
+        </div>
+      </form>
+    </dialog>
+
+    <template id="leadCardTemplate">
+      <article class="lead-card">
+        <header>
+          <div class="lead-name-row">
+            <h4 class="lead-name"></h4>
+          </div>
+          <div class="lead-contact-row">
+            <p class="lead-email"></p>
+            <button type="button" class="copy-btn copy-email-btn" title="Copy email" aria-label="Copy email">
+              <span class="copy-icon" aria-hidden="true"></span>
+            </button>
+          </div>
+          <div class="lead-contact-row">
+            <p class="lead-phone"></p>
+            <button type="button" class="copy-btn copy-phone-btn" title="Copy phone" aria-label="Copy phone">
+              <span class="copy-icon" aria-hidden="true"></span>
+            </button>
+          </div>
+          <p class="lead-state"></p>
+          <p class="appointment-time first-appointment-time"></p>
+          <p class="appointment-time second-appointment-time"></p>
+          <p class="appointment-time third-appointment-time"></p>
+        </header>
+        <div class="lead-meta">
+          <div class="pill-row">
+            <span class="pill status"></span>
+            <span class="pill appointment"></span>
+          </div>
+        </div>
+        <div class="lead-body">
+          <p class="money"></p>
+          <div class="preview-grid">
+            <div class="preview-item">
+              <p class="preview-label">Next Action</p>
+              <p class="preview-value next-preview"></p>
+            </div>
+            <div class="preview-item">
+              <p class="preview-label">Top Task</p>
+              <p class="preview-value task-preview"></p>
+            </div>
+            <div class="preview-item preview-item-wide">
+              <p class="preview-label">Last Touch</p>
+              <p class="preview-value last-touch-preview"></p>
+            </div>
+          </div>
+          <p class="prospect-notes"></p>
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-small btn-secondary edit-btn">Edit</button>
+          <button class="btn btn-small btn-ghost advance-btn">Advance Stage</button>
+        </div>
+      </article>
+    </template>
+
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
